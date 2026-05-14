@@ -1,0 +1,94 @@
+
+import numpy as np
+import time
+import random
+from collections.abc import Iterable
+
+
+class Assignment2:
+    def __init__(self):
+        """
+        Here goes any one time calculation that need to be made before 
+        solving the assignment for specific functions. 
+        """
+
+        pass
+
+    """
+        Finds intersection points of two functions f1 and f2 on the interval [a, b].
+        The method works by:
+        1. Partitioning the interval into small subintervals.
+        2. Detecting subintervals that may contain a root of g(x) = f1(x) - f2(x).
+        3. Applying the Bisection method to safely isolate a root.
+        4. Refining the root using a few Newton–Raphson iterations.
+        5. Returning only distinct roots whose error is at most maxerr.
+    """
+    def intersections(self, f1: callable, f2: callable, a: float, b: float, maxerr=0.001) -> Iterable:
+        def g(x):
+            return f1(x) - f2(x)
+
+        if a > b:
+            a, b = b, a
+
+        # partition interval [a,b] into small subinterval in order to avoid missing any roots.
+        length = b - a
+        solutions = []
+        sections = max(200, int(length * 300))
+        if sections > 20000:
+            sections = 20000
+        size_sections = length / sections
+        xtol = 1e-10
+        left = a
+        g_left = g(left)
+        for i in range(1, sections + 1):
+            right = a + i * size_sections
+            g_right = g(right)
+            mid_point = (left + right) / 2
+            g_mid_point = g(mid_point)
+
+            # check if this subinterval may contain a root
+            if (g_left * g_right <= 0) or (abs(g_mid_point) < maxerr):
+                l, r = left, right
+                g_l, g_r = g_left, g_right
+                # Bisection - stable root isolation
+                mid = (l + r) / 2
+                for j in range(20):
+                    g_mid = g(mid)
+                    if abs(g_mid) < maxerr:
+                        break
+                    if g_l * g_mid <= 0:
+                        r, g_r = mid, g_mid
+                    else:
+                        l, g_l = mid, g_mid
+                    mid = (l + r) / 2
+                root = mid
+
+                # newton-Raphson algorithm
+                for j in range(5):
+                    g_root = g(root)
+                    if abs(g_root) < maxerr:
+                        break
+                    # the derivative is computed numerically
+                    adj_epsilon = 1e-7 * (1 + abs(root))
+                    nomeric_derivative = (g(root + adj_epsilon) - g(root - adj_epsilon)) / (2 * adj_epsilon)
+                    if abs(nomeric_derivative) < 1e-14:
+                        break
+                    new_root = root - g_root / nomeric_derivative
+                    # keep the iterate inside the current interval
+                    if new_root < l or new_root > r:
+                        break
+                    root = new_root
+
+                # add the root only if it is accurate and not a duplicate
+                if abs(g(root)) <= maxerr:
+                    isNew = True
+                    for s in solutions:
+                        if abs(root - s) < xtol * (1 + abs(root)):
+                            isNew = False
+                            break
+                    if isNew and a <= root and root <= b:
+                        solutions.append(root)
+            left = right
+            g_left = g_right
+        return solutions
+##########################################################################
