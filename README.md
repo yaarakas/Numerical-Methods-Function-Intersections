@@ -1,2 +1,18 @@
-# Numerical-Methods-Function-Intersections
-Implemented numerical algorithms in Python to detect intersection points between mathematical functions. Combined Bisection and Newton–Raphson methods for accurate and efficient root approximation. Applied numerical differentiation, interval partitioning, and error-based optimization techniques using NumPy.
+# Numerical Methods – Function Intersections
+
+This project implements numerical algorithms in Python for finding intersection points between mathematical functions.
+
+## Features
+- Bisection method for stable root isolation
+- Newton–Raphson refinement for improved accuracy
+- Numerical derivative approximation
+- Error-based optimization and duplicate filtering
+
+## Technologies
+- Python
+- NumPy
+
+## Algorithms Used
+- Bisection Method
+- Newton–Raphson Method
+- Numerical Differentiation
